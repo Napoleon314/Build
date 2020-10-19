@@ -1,0 +1,68 @@
+////////////////////////////////////////////////////////////////////////////
+//
+// -------------------------------------------------------------------------
+//  Module:      @APP_NAME@
+//  File name:   VeEntry.cpp
+//  Description: Cross-platform entry for @APP_NAME@
+// -------------------------------------------------------------------------
+//
+////////////////////////////////////////////////////////////////////////////
+
+#include <Venus3D.h>
+
+extern void VeMain(int argc, char * argv[]) noexcept;
+
+#if defined(VE_PLATFORM_WIN) && defined(SUBSYSTEM_WINDOWS)
+
+int APIENTRY wWinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPWSTR, _In_ int)
+{
+	VeInitData kData =
+	{
+		"@APP_NAME@",
+		VE_MAKE_VERSION(@APP_VER@),
+		VE_INIT_WINDOW
+	};
+	VeInit(kData, &VeLog::WindowOutput);
+	VeMain(0, {nullptr});
+	VeTerm();
+	return 0;
+}
+
+#elif defined(VE_PLATFORM_ANDROID)
+
+#include <string.h>
+#include <jni.h>
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_com_venus3d_androidcpp_MainActivity_stringFromJNI(
+        JNIEnv* env,
+        jobject /* this */) {
+    VeInitData kData =
+	{
+		"@APP_NAME@",
+		VE_MAKE_VERSION(@APP_VER@),
+		VE_INIT_CONSOLE
+	};
+	VeInit(kData, &VeLog::ConsoleOutput);
+    VeMain(0, {nullptr});
+	VeTerm();
+    return env->NewStringUTF("Hello from C++4");
+}
+
+#else
+
+int main(int argc, char * argv[])
+{
+	VeInitData kData =
+	{
+		"@APP_NAME@",
+		VE_MAKE_VERSION(@APP_VER@),
+		VE_INIT_CONSOLE
+	};
+	VeInit(kData, &VeLog::ConsoleOutput);
+	VeMain(argc, argv);
+	VeTerm();
+	return 0;
+}
+
+#endif
